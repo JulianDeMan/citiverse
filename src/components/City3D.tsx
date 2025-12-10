@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useCallback, useEffect } from "react";
+import { useMemo, useState, useCallback, useEffect } from "react";
 import DeckGL from "@deck.gl/react";
 import { Map } from "react-map-gl/maplibre";
 import maplibregl from "maplibre-gl";
@@ -30,7 +30,9 @@ const FALLBACK = { longitude: 4.4777, latitude: 51.9244, zoom: 12.5, pitch: 60, 
 const TILESET_URL =
   "https://www.3drotterdam.nl/datasource-data/3adbe5af-d05c-475a-b34c-59e69ba8dadc/tileset.json";
 
-const brandGreen = [47, 111, 87];
+/** vaste RGBA-kleur (type-zeker voor Deck.gl) */
+const BRAND_GREEN_RGBA: [number, number, number, number] = [47, 111, 87, 220];
+
 const rad2deg = (r: number) => (r * 180) / Math.PI;
 
 type Props = {
@@ -61,7 +63,7 @@ export default function City3D({ projects, focus, onSelect }: Props) {
       data: projects,
       pickable: true,
       getPosition: (d) => [d.lon, d.lat],
-      getFillColor: (d) => [...brandGreen, 220],
+      getFillColor: BRAND_GREEN_RGBA,
       getLineColor: [255, 255, 255],
       lineWidthMinPixels: 1,
       stroked: true,
@@ -132,7 +134,7 @@ export default function City3D({ projects, focus, onSelect }: Props) {
 
   return (
     <DeckGL
-      renderer="webgl"
+      // renderer prop verwijderen; types kennen die niet
       useDevicePixels={1}
       glOptions={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
       layers={layers as any}
@@ -149,7 +151,6 @@ export default function City3D({ projects, focus, onSelect }: Props) {
     >
       <Map
         mapLib={maplibregl}
-        // Kleurrijkere basemap (Voyager); pas gerust aan
         mapStyle="https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json"
         reuseMaps
       />

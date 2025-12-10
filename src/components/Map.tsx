@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import maplibregl, {
   Map as MapLibreMap,
   Marker as MLMarker,
@@ -103,6 +103,5 @@ export default function Map({ onSelect, filteredIds, focus, fitBump = 0 }: Props
     });
   }, [focus]);
 
-  /* Belangrijk: deze container bepaalt de canvas-hoogte (via .pv-map) */
-  return <div ref={containerRef} className="pv-map" />;
+  return <div ref={containerRef} style={{ width: "100%", height: "100%" }} />;
 }
