@@ -5,10 +5,8 @@
   --pv-border:#e5e7eb;
   --pv-text:#1f2937;
   --bg:#eaf3ef;
-  /* centrale kaarthoogte */
   --map-height: 560px;
 }
-
 *{box-sizing:border-box}
 html,body,#root{height:100%}
 body{
@@ -17,7 +15,6 @@ body{
   color:var(--pv-text);
   background:var(--bg);
 }
-
 /* Header */
 .pv-header{ background:var(--pv-green); color:#fff; }
 .pv-header-inner{
@@ -34,14 +31,12 @@ body{
   color:#fff; background:transparent; cursor:pointer;
 }
 .pv-header-btn:hover{ background:rgba(255,255,255,.08) }
-
 /* Layout */
 .pv-main{
   max-width:1280px; margin:0 auto; padding:16px;
   display:grid; grid-template-columns: 320px 1fr 320px; gap:16px;
 }
 @media (max-width:1180px){ .pv-main{ grid-template-columns: 1fr; } }
-
 /* Cards */
 .pv-card{
   background:#fff; border:1px solid var(--pv-border);
@@ -53,7 +48,6 @@ body{
   border-bottom:1px solid var(--pv-border); background:#f8faf9;
 }
 .pv-card-body{ padding:12px; display:grid; gap:12px }
-
 /* Inputs & buttons */
 .pv-input{
   width:100%; padding:10px 12px; border-radius:12px;
@@ -70,8 +64,7 @@ body{
   padding:8px 12px; border-radius:12px; font-weight:600;
 }
 .pv-btn-outline:hover{ background:var(--pv-green-50) }
-
-/* ✅ Kaartcontainers (alle grootte wordt hiervandaan bepaald) */
+/* Kaartcontainers */
 .pv-map{
   position:relative;
   height:var(--map-height);
@@ -80,8 +73,6 @@ body{
   overflow:hidden;
   border:1px solid var(--pv-border);
 }
-
-/* canvassen vullen alleen de container binnen .pv-map */
 .pv-map .maplibregl-map,
 .pv-map .maplibregl-canvas,
 .pv-map .deckgl-map,
@@ -92,8 +83,7 @@ body{
   position:absolute;
   left:0; top:0;
 }
-
-/* 2D markerstijl */
+/* 2D markerstijl (als je ooit 2D terugplaatst) */
 .pv-marker{
   background:#2f6f57; color:#fff; border:2px solid #fff; border-radius:9999px;
   padding:6px 10px; font-size:11px; box-shadow:0 4px 10px rgba(0,0,0,.2);
