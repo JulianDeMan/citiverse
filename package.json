@@ -1,41 +1,27 @@
 {
   "name": "citiverse",
-  "private": true,
   "version": "0.0.0",
+  "private": true,
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
-    "lint": "eslint .",
+    "build": "vite build",
     "preview": "vite preview"
   },
   "dependencies": {
+    "@deck.gl/core": "^9.2.5",
+    "@deck.gl/geo-layers": "^9.2.5",
+    "@deck.gl/layers": "^9.2.5",
     "@deck.gl/react": "^9.2.5",
-    "deck.gl": "^9.2.5",
-    "framer-motion": "^12.23.25",
-    "lucide-react": "^0.556.0",
-    "maplibre-gl": "^5.14.0",
-    "react": "19.2.0",
-    "react-dom": "19.2.0",
+    "@loaders.gl/3d-tiles": "^4.3.2",
+    "@loaders.gl/core": "^4.3.2",
+    "maplibre-gl": "^3.6.2",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
     "react-map-gl": "^8.1.0",
-    "react-router-dom": "^7.10.1"
+    "vite": "^5.0.0"
   },
   "devDependencies": {
-    "@eslint/js": "^9.39.1",
-    "@tailwindcss/postcss": "^4.1.17",
-    "@types/node": "^24.10.1",
-    "@types/react": "^19.2.5",
-    "@types/react-dom": "^19.2.3",
-    "@vitejs/plugin-react": "^5.1.1",
-    "autoprefixer": "^10.4.22",
-    "eslint": "^9.39.1",
-    "eslint-plugin-react-hooks": "^7.0.1",
-    "eslint-plugin-react-refresh": "^0.4.24",
-    "globals": "^16.5.0",
-    "postcss": "^8.5.6",
-    "tailwindcss": "^4.1.17",
-    "typescript": "~5.9.3",
-    "typescript-eslint": "^8.46.4",
-    "vite": "^7.2.4"
+    "typescript": "^5.4.0"
   }
 }

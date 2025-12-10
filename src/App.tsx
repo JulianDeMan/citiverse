@@ -2,14 +2,11 @@ import React, { useMemo, useState } from "react";
 import City3D from "./components/City3D";
 import { PROJECTS, POSTCODE_AREAS } from "./data";
 import "./index.css";
-import logo from "./assets/planvertaler.png";
-
-type Focus = { lat: number; lon: number; zoom?: number } | null;
 
 export default function App() {
   const [query, setQuery] = useState("");
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [focus3D, setFocus3D] = useState<Focus>(null);
+  const [focus3D, setFocus3D] = useState<{ lat: number; lon: number; zoom?: number } | null>(null);
   const [showFeedback, setShowFeedback] = useState(false);
 
   const filtered = useMemo(() => {
@@ -25,59 +22,39 @@ export default function App() {
   const selected = useMemo(() => PROJECTS.find(p => p.id === selectedId) || null, [selectedId]);
 
   function handleSearchGo() {
-    // 1) Postcode -> focus op eerste match
     if (POSTCODE_AREAS[query]) {
       const area = POSTCODE_AREAS[query];
       const p = PROJECTS.find(x => x.area.toLowerCase().includes(area.toLowerCase()));
-      if (p) {
-        setSelectedId(p.id);
-        setFocus3D({ lat: p.lat, lon: p.lon, zoom: 15 });
-        return;
-      }
+      if (p) { setSelectedId(p.id); setFocus3D({ lat: p.lat, lon: p.lon, zoom: 15 }); return; }
     }
-    // 2) Eén resultaat -> focus daarop
     if (filtered.length === 1) {
-      const p = filtered[0];
-      setSelectedId(p.id);
-      setFocus3D({ lat: p.lat, lon: p.lon, zoom: 16 });
-      return;
+      const p = filtered[0]; setSelectedId(p.id); setFocus3D({ lat: p.lat, lon: p.lon, zoom: 16 }); return;
     }
-    // 3) Meerdere resultaten -> focus op eerste (eenvoudig en duidelijk)
     if (filtered.length > 1) {
-      const p = filtered[0];
-      setSelectedId(p.id);
-      setFocus3D({ lat: p.lat, lon: p.lon, zoom: 14 });
-      return;
+      const p = filtered[0]; setSelectedId(p.id); setFocus3D({ lat: p.lat, lon: p.lon, zoom: 14 }); return;
     }
-    // 4) Geen resultaten
     alert("Geen resultaten gevonden voor je zoekopdracht.");
   }
 
   function handleFeedbackSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    const form = e.currentTarget;
-    const fd = new FormData(form);
+    const fd = new FormData(e.currentTarget);
     const naam = (fd.get("naam") as string) || "";
     const email = (fd.get("email") as string) || "";
     const onderwerp = (fd.get("onderwerp") as string) || "Feedback Citiverse";
     const bericht = (fd.get("bericht") as string) || "";
-    const body =
-      `Naam: ${naam}\nEmail: ${email}\nOnderwerp: ${onderwerp}\n\nBericht:\n${bericht}\n\n— Verzonden via PlanVertaler – Citiverse`;
-    // Stuur via mailto (je kunt hier je echte mailadres invullen)
-    const to = "citiverse@voorbeeld.nl";
-    const mailto = `mailto:${encodeURIComponent(to)}?subject=${encodeURIComponent(
-      onderwerp
-    )}&body=${encodeURIComponent(body)}`;
-    window.location.href = mailto;
+    const to = "citiverse@voorbeeld.nl"; // <-- vervang door jouw e-mailadres
+    const body = `Naam: ${naam}\nEmail: ${email}\nOnderwerp: ${onderwerp}\n\nBericht:\n${bericht}\n\n— Verzonden via PlanVertaler – Citiverse`;
+    window.location.href = `mailto:${encodeURIComponent(to)}?subject=${encodeURIComponent(onderwerp)}&body=${encodeURIComponent(body)}`;
     setShowFeedback(false);
   }
 
   return (
     <div>
-      {/* Header */}
       <header className="pv-header">
         <div className="pv-header-inner">
-          <img src={logo} alt="PlanVertaler Rotterdam" className="pv-logo" />
+          {/* Logo uit /public */}
+          <img src="/planvertaler.png" alt="PlanVertaler Rotterdam" className="pv-logo" />
           <div className="pv-header-title">
             <div className="title">PlanVertaler – Citiverse</div>
             <div className="subtitle">Rotterdam</div>
@@ -87,7 +64,6 @@ export default function App() {
         </div>
       </header>
 
-      {/* Grid */}
       <main className="pv-main">
         {/* LINKS */}
         <section className="pv-card">
@@ -114,7 +90,7 @@ export default function App() {
           </div>
         </section>
 
-        {/* MIDDEN: alleen de 3D Rotterdam kaart (OUP) */}
+        {/* MIDDEN: alleen 3D Rotterdam (OUP) */}
         <section className="pv-card">
           <div className="pv-card-header">3D Rotterdam</div>
           <div className="pv-card-body">

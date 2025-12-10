@@ -23,16 +23,13 @@ type Project = {
   ready: string;
   type: string[];
 };
-
 type Focus = { lat: number; lon: number; zoom?: number } | null;
 
 const FALLBACK = { longitude: 4.4777, latitude: 51.9244, zoom: 12.5, pitch: 60, bearing: 0 };
 const TILESET_URL =
   "https://www.3drotterdam.nl/datasource-data/3adbe5af-d05c-475a-b34c-59e69ba8dadc/tileset.json";
 
-/** vaste RGBA-kleur (type-zeker voor Deck.gl) */
 const BRAND_GREEN_RGBA: [number, number, number, number] = [47, 111, 87, 220];
-
 const rad2deg = (r: number) => (r * 180) / Math.PI;
 
 type Props = {
@@ -50,49 +47,40 @@ export default function City3D({ projects, focus, onSelect }: Props) {
     setViewState((v) => ({ ...v, longitude: lon, latitude: lat, zoom, pitch: 60, bearing: 0 }));
   }, []);
 
-  // reageer op focus van buiten (zoek)
-  useEffect(() => {
-    if (focus) {
-      zoomToCenter(focus.lon, focus.lat, focus.zoom ?? 15);
-    }
-  }, [focus, zoomToCenter]);
+  useEffect(() => { if (focus) zoomToCenter(focus.lon, focus.lat, focus.zoom ?? 15); }, [focus, zoomToCenter]);
 
-  const projectLayer = useMemo(() => {
-    return new ScatterplotLayer<Project>({
-      id: "projects-pts",
-      data: projects,
-      pickable: true,
-      getPosition: (d) => [d.lon, d.lat],
-      getFillColor: BRAND_GREEN_RGBA,
-      getLineColor: [255, 255, 255],
-      lineWidthMinPixels: 1,
-      stroked: true,
-      radiusMinPixels: 6,
-      radiusMaxPixels: 18,
-      getRadius: () => 60,
-      onClick: (info: PickingInfo<Project>) => {
-        if (info.object) {
-          setPicked(info.object);
-          onSelect?.(info.object.id, { lat: info.object.lat, lon: info.object.lon });
-        }
-      },
-    });
-  }, [projects, onSelect]);
+  const projectLayer = useMemo(() => new ScatterplotLayer<Project>({
+    id: "projects-pts",
+    data: projects,
+    pickable: true,
+    getPosition: d => [d.lon, d.lat],
+    getFillColor: BRAND_GREEN_RGBA,
+    getLineColor: [255, 255, 255],
+    lineWidthMinPixels: 1,
+    stroked: true,
+    radiusMinPixels: 6,
+    radiusMaxPixels: 18,
+    getRadius: () => 60,
+    onClick: (info: PickingInfo<Project>) => {
+      if (info.object) {
+        setPicked(info.object);
+        onSelect?.(info.object.id, { lat: info.object.lat, lon: info.object.lon });
+      }
+    },
+  }), [projects, onSelect]);
 
-  const labelLayer = useMemo(() => {
-    return new TextLayer<Project>({
-      id: "projects-labels",
-      data: projects,
-      pickable: false,
-      getPosition: (d) => [d.lon, d.lat],
-      getText: (d) => d.area,
-      getSize: 12,
-      getColor: [30, 56, 43, 230],
-      getTextAnchor: "start",
-      getAlignmentBaseline: "center",
-      getPixelOffset: [10, 0],
-    });
-  }, [projects]);
+  const labelLayer = useMemo(() => new TextLayer<Project>({
+    id: "projects-labels",
+    data: projects,
+    pickable: false,
+    getPosition: d => [d.lon, d.lat],
+    getText: d => d.area,
+    getSize: 12,
+    getColor: [30, 56, 43, 230],
+    getTextAnchor: "start",
+    getAlignmentBaseline: "center",
+    getPixelOffset: [10, 0],
+  }), [projects]);
 
   const tilesLayer = useMemo(() => {
     if (!TILESET_URL) { setStatus("Geen tileset URL."); return null as any; }
@@ -127,52 +115,31 @@ export default function City3D({ projects, focus, onSelect }: Props) {
     });
   }, [zoomToCenter]);
 
-  const layers = useMemo(
-    () => [tilesLayer, projectLayer, labelLayer].filter(Boolean),
-    [tilesLayer, projectLayer, labelLayer]
-  );
+  const layers = useMemo(() => [tilesLayer, projectLayer, labelLayer].filter(Boolean), [tilesLayer, projectLayer, labelLayer]);
 
   return (
     <DeckGL
-      // renderer prop verwijderen; types kennen die niet
       useDevicePixels={1}
-      glOptions={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
       layers={layers as any}
       initialViewState={viewState}
       viewState={viewState}
       controller={true}
       onViewStateChange={(e) => setViewState(e.viewState as any)}
-      getTooltip={({ object }) =>
-        object && (object as Project).title
-          ? `${(object as Project).title}\n${(object as Project).area}`
-          : null
-      }
+      getTooltip={({ object }) => object && (object as Project).title ? `${(object as Project).title}\n${(object as Project).area}` : null}
       style={{ width: "100%", height: "100%" }}
     >
-      <Map
-        mapLib={maplibregl}
-        mapStyle="https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json"
-        reuseMaps
-      />
+      <Map mapLib={maplibregl} mapStyle="https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json" reuseMaps />
       {(status || picked) && (
         <div style={{ position: "absolute", left: 12, bottom: 12, display: "grid", gap: 8, maxWidth: 420 }}>
           {status && (
-            <div style={{
-              background: "rgba(0,0,0,.6)", color: "#fff", padding: "6px 8px",
-              borderRadius: 8, fontSize: 12, width: "fit-content"
-            }}>
+            <div style={{ background: "rgba(0,0,0,.6)", color: "#fff", padding: "6px 8px", borderRadius: 8, fontSize: 12, width: "fit-content" }}>
               {status}
             </div>
           )}
           {picked && (
-            <div style={{
-              background: "#fff", border: "1px solid #e5e7eb", borderRadius: 12,
-              boxShadow: "0 8px 24px rgba(0,0,0,.12)", padding: 12
-            }}>
+            <div style={{ background: "#fff", border: "1px solid #e5e7eb", borderRadius: 12, boxShadow: "0 8px 24px rgba(0,0,0,.12)", padding: 12 }}>
               <div style={{ fontWeight: 700, color: "#16324f" }}>{picked.title}</div>
-              <div style={{ fontSize: 12, color: "#6b7280", marginBottom: 6 }}>
-                Gebied: {picked.area} • Fase: {picked.status}
-              </div>
+              <div style={{ fontSize: 12, color: "#6b7280", marginBottom: 6 }}>Gebied: {picked.area} • Fase: {picked.status}</div>
               <div style={{ fontSize: 14, marginBottom: 8 }}>{picked.summary}</div>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 8 }}>
                 <div style={{ background: "#e6f1ec", padding: 8, borderRadius: 10 }}>
@@ -189,12 +156,7 @@ export default function City3D({ projects, focus, onSelect }: Props) {
                 </div>
               </div>
               <div style={{ display: "flex", gap: 8, marginTop: 10 }}>
-                <button
-                  className="pv-btn-outline"
-                  onClick={() => zoomToCenter(picked.lon, picked.lat, 16)}
-                >
-                  Zoom naar project
-                </button>
+                <button className="pv-btn-outline" onClick={() => zoomToCenter(picked.lon, picked.lat, 16)}>Zoom naar project</button>
                 <button className="pv-btn" onClick={() => setPicked(null)}>Sluiten</button>
               </div>
             </div>
