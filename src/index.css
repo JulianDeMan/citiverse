@@ -1,0 +1,101 @@
+:root{
+  --pv-green:#2f6f57;
+  --pv-green-50:#e6f1ec;
+  --pv-blue:#16324f;
+  --pv-border:#e5e7eb;
+  --pv-text:#1f2937;
+  --bg:#eaf3ef;
+  /* centrale kaarthoogte */
+  --map-height: 560px;
+}
+
+*{box-sizing:border-box}
+html,body,#root{height:100%}
+body{
+  margin:0;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+  color:var(--pv-text);
+  background:var(--bg);
+}
+
+/* Header */
+.pv-header{ background:var(--pv-green); color:#fff; }
+.pv-header-inner{
+  max-width:1280px; margin:0 auto; padding:12px 16px;
+  display:flex; align-items:center; gap:12px;
+}
+.pv-logo{ width:36px; height:auto; border-radius:8px }
+.pv-header-title .title{ font-weight:700; font-size:18px; line-height:1 }
+.pv-header-title .subtitle{ font-size:12px; opacity:.9 }
+.pv-header-spacer{ margin-left:auto }
+.pv-header-btn{
+  display:inline-flex; align-items:center; gap:8px;
+  padding:8px 12px; border-radius:9999px; border:1px solid rgba(255,255,255,.35);
+  color:#fff; background:transparent; cursor:pointer;
+}
+.pv-header-btn:hover{ background:rgba(255,255,255,.08) }
+
+/* Layout */
+.pv-main{
+  max-width:1280px; margin:0 auto; padding:16px;
+  display:grid; grid-template-columns: 320px 1fr 320px; gap:16px;
+}
+@media (max-width:1180px){ .pv-main{ grid-template-columns: 1fr; } }
+
+/* Cards */
+.pv-card{
+  background:#fff; border:1px solid var(--pv-border);
+  border-radius:16px; box-shadow:0 6px 16px rgba(0,0,0,.06);
+  overflow:hidden;
+}
+.pv-card-header{
+  padding:12px 14px; font-weight:700; color:var(--pv-green);
+  border-bottom:1px solid var(--pv-border); background:#f8faf9;
+}
+.pv-card-body{ padding:12px; display:grid; gap:12px }
+
+/* Inputs & buttons */
+.pv-input{
+  width:100%; padding:10px 12px; border-radius:12px;
+  border:1px solid var(--pv-border); background:#fff; font-size:14px;
+}
+.pv-btn{
+  background:var(--pv-green); color:#fff; border:none; cursor:pointer;
+  padding:10px 14px; border-radius:12px; font-weight:600;
+}
+.pv-btn:hover{ filter:brightness(1.05) }
+.pv-btn-outline{
+  background:#fff; color:var(--pv-green);
+  border:1px solid var(--pv-green); cursor:pointer;
+  padding:8px 12px; border-radius:12px; font-weight:600;
+}
+.pv-btn-outline:hover{ background:var(--pv-green-50) }
+
+/* ✅ Kaartcontainers (alle grootte wordt hiervandaan bepaald) */
+.pv-map{
+  position:relative;
+  height:var(--map-height);
+  width:100%;
+  border-radius:12px;
+  overflow:hidden;
+  border:1px solid var(--pv-border);
+}
+
+/* canvassen vullen alleen de container binnen .pv-map */
+.pv-map .maplibregl-map,
+.pv-map .maplibregl-canvas,
+.pv-map .deckgl-map,
+.pv-map .deckgl-canvas,
+.pv-map #deckgl-overlay{
+  width:100% !important;
+  height:100% !important;
+  position:absolute;
+  left:0; top:0;
+}
+
+/* 2D markerstijl */
+.pv-marker{
+  background:#2f6f57; color:#fff; border:2px solid #fff; border-radius:9999px;
+  padding:6px 10px; font-size:11px; box-shadow:0 4px 10px rgba(0,0,0,.2);
+  white-space:nowrap; pointer-events:auto;
+}
