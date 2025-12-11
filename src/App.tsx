@@ -4,6 +4,7 @@ import { PROJECTS, POSTCODE_AREAS, Project } from "./data";
 import "./index.css";
 import logo from "./assets/planvertaler.png";
 import AssistantPanel from "./components/AssistantPanel";
+import { NotificationsButton, NotificationsRoot } from "./components/Notifications";
 
 type Focus = { lat: number; lon: number; zoom?: number } | null;
 
@@ -152,7 +153,7 @@ export default function App() {
             <div className="subtitle">Rotterdam</div>
           </div>
           <div className="pv-header-spacer" />
-          <button className="pv-header-btn">🔔 Meldingen</button>
+          <NotificationsButton />
         </div>
       </header>
 
@@ -227,4 +228,5 @@ export default function App() {
       </main>
     </div>
   );
+  <Notifications />
 }
