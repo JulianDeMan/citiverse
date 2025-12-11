@@ -36,11 +36,11 @@ export default function AssistantPanel() {
     setLoading(true);
 
     try {
-      const res = await fetch("/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: next }),
-      });
+const res = await fetch("/api/ask", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ question: input })
+});
 
       // probeer body als json (ook bij error)
       let data: any = null;

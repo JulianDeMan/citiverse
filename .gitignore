@@ -32,3 +32,5 @@ dist-ssr
 dist
 node_modules
 
+
+.vercel

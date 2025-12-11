@@ -7,20 +7,27 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "server": "ts-node server/index.ts"
+    "dev:vercel": "vercel dev"
   },
+  "engines": { "node": ">=18" },
+  
   "dependencies": {
     "@deck.gl/core": "^9.2.5",
     "@deck.gl/geo-layers": "^9.2.5",
     "@deck.gl/layers": "^9.2.5",
     "@deck.gl/react": "^9.2.5",
-    "@loaders.gl/3d-tiles": "^4.2.2",
-    "@loaders.gl/core": "^4.2.2",
+    "@loaders.gl/3d-tiles": "^4.3.4",
+    "@loaders.gl/core": "^4.3.4",
+    "@vercel/kv": "^2.0.0",
     "framer-motion": "^11.0.0",
     "lucide-react": "^0.469.0",
     "maplibre-gl": "^4.7.1",
+    "openai": "^4.73.0",
+    "pdf-parse": "^1.1.1",
     "react": "19.2.0",
-    "react-dom": "19.2.0"
+    "react-dom": "19.2.0",
+    "react-map-gl": "^8.1.0",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "@types/node": "^22.10.2",
