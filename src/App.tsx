@@ -5,6 +5,7 @@ import "./index.css";
 import logo from "./assets/planvertaler.png";
 import AssistantPanel from "./components/AssistantPanel";
 import { NotificationsButton, NotificationsRoot } from "./components/Notifications";
+import Feedback from "./components/Feedback";
 
 type Focus = { lat: number; lon: number; zoom?: number } | null;
 
@@ -182,7 +183,7 @@ export default function App() {
             <p style={{ fontSize: 14, color: "#374151" }}>
               Denk mee over plannen in jouw buurt. Deel ideeën of zorgen – we koppelen terug wat ermee gebeurt.
             </p>
-            <button className="pv-btn-outline">Geef feedback</button>
+            <Feedback />
           </div>
         </section>
 
