@@ -89,3 +89,65 @@ body{
   padding:6px 10px; font-size:11px; box-shadow:0 4px 10px rgba(0,0,0,.2);
   white-space:nowrap; pointer-events:auto;
 }
+
+/* ===== PlanVertaler – Feedback styles (no Tailwind) ===== */
+:root{
+  --pv-green:#2f6f57;
+  --pv-brd:#e6e9ec;
+  --pv-text:#0f172a;
+  --pv-muted:#6b7280;
+  --pv-white:#ffffff;
+  --pv-shadow:0 6px 16px rgba(0,0,0,.08);
+}
+
+.mt-16{ margin-top: 16px; }
+
+/* Card */
+.pv-card{ border:1px solid var(--pv-brd); border-radius:12px; background:var(--pv-white); box-shadow:0 2px 6px rgba(16,24,40,.04);}
+.pv-card-header{ display:flex; align-items:center; gap:8px; padding:12px 16px; border-bottom:1px solid var(--pv-brd); color:var(--pv-green); font-weight:600;}
+.pv-badge{ display:inline-flex; width:20px; height:20px; align-items:center; justify-content:center; border:1px solid var(--pv-brd); border-radius:999px; font-size:12px; }
+.pv-card-body{ padding:16px; }
+.pv-text{ color:#334155; line-height:1.6; font-size:14px; }
+
+/* Buttons */
+.pv-btn{ display:inline-flex; align-items:center; gap:8px; border-radius:10px; line-height:1; padding:10px 14px; font-weight:600; border:1px solid transparent; cursor:pointer; transition:filter .15s ease, background .15s ease, opacity .15s ease; }
+.pv-btn--primary{ background:var(--pv-green); color:#fff; box-shadow:var(--pv-shadow); }
+.pv-btn--primary:hover{ filter:brightness(.97); }
+.pv-btn--ghost{ background:#fff; color:#0f172a; border-color:var(--pv-brd); }
+.pv-btn--ghost:hover{ background:#f8fafc; }
+
+/* Modal */
+.pv-modal{ position:fixed; inset:0; z-index:60; }
+.pv-modal__overlay{ position:absolute; inset:0; background:rgba(15,23,42,.5); backdrop-filter: blur(1px); }
+.pv-modal__panel{ position:absolute; inset:0; top:8vh; margin-inline:auto; width:min(680px,94%); background:#fff; border:1px solid var(--pv-brd); border-radius:16px; box-shadow:0 16px 40px rgba(0,0,0,.15); }
+.pv-modal__header{ display:flex; justify-content:space-between; align-items:center; padding:16px 20px; border-bottom:1px solid var(--pv-brd); }
+.pv-modal__title{ margin:0; font-size:18px; font-weight:700; color:var(--pv-text); }
+.pv-muted{ margin-top:4px; color:var(--pv-muted); font-size:13px; }
+.pv-modal__body{ padding:20px; }
+
+/* Icon button */
+.pv-iconbtn{ width:36px; height:36px; border:1px solid var(--pv-brd); border-radius:999px; background:#fff; color:#475569; cursor:pointer; }
+.pv-iconbtn:hover{ background:#f8fafc; }
+
+/* Form */
+.pv-form{ display:grid; grid-template-columns:1fr; gap:14px; }
+.pv-field{ display:block; }
+.pv-label{ display:block; font-size:13px; font-weight:600; color:#334155; margin-bottom:6px; }
+.pv-input,.pv-textarea{ width:100%; font-size:14px; color:#0f172a; background:#fff; border:1px solid var(--pv-brd); border-radius:10px; padding:10px 12px; outline:none; transition:border .15s ease, box-shadow .15s ease; }
+.pv-input:focus,.pv-textarea:focus{ border-color:var(--pv-green); box-shadow:0 0 0 3px rgba(47,111,87,.16); }
+.pv-textarea{ resize:vertical; min-height:120px; }
+.is-invalid{ border-color:#fda4a4 !important; box-shadow:0 0 0 3px rgba(239,68,68,.12) !important; }
+.pv-error{ margin-top:6px; color:#e11d48; font-size:12px; }
+
+/* Checkbox */
+.pv-check{ display:flex; gap:10px; align-items:flex-start; font-size:14px; color:#334155; }
+.pv-check input{ margin-top:4px; width:16px; height:16px; accent-color:var(--pv-green); }
+
+/* Alert */
+.pv-alert{ border-radius:12px; padding:14px 16px; border:1px solid; }
+.pv-alert--success{ border-color:#bbf7d0; background:#f0fdf4; color:#166534; }
+.pv-alert__title{ font-weight:700; margin-bottom:4px; }
+.pv-alert__text{ font-size:14px; color:#166534; }
+
+/* Actions */
+.pv-actions{ display:flex; gap:12px; align-items:center; margin-top:8px; }
