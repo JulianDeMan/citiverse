@@ -1,71 +1,164 @@
 import React, { useMemo, useState } from "react";
 import City3D from "./components/City3D";
-import { PROJECTS, POSTCODE_AREAS } from "./data";
+import { PROJECTS, POSTCODE_AREAS, Project } from "./data";
 import "./index.css";
+import logo from "./assets/planvertaler.png";
+import AssistantPanel from "./components/AssistantPanel";
+
+type Focus = { lat: number; lon: number; zoom?: number } | null;
+
+function ProjectCard({
+  project,
+  onZoom,
+  onClose,
+}: {
+  project: Project;
+  onZoom: () => void;
+  onClose: () => void;
+}) {
+  return (
+    <div
+      style={{
+        position: "absolute",
+        left: 12,
+        bottom: 12,
+        background: "#fff",
+        border: "1px solid #e5e7eb",
+        borderRadius: 12,
+        padding: 12,
+        boxShadow: "0 8px 24px rgba(0,0,0,0.12)",
+        maxWidth: 380,
+        width: 380,
+        zIndex: 10,
+      }}
+    >
+      <div style={{ fontWeight: 700, fontSize: 16 }}>{project.title}</div>
+      <div style={{ color: "#6B7280", fontSize: 12, marginTop: 4 }}>
+        Gebied: {project.area} • Fase: {project.status}
+      </div>
+      <p style={{ marginTop: 8, fontSize: 14, color: "#374151" }}>{project.summary}</p>
+
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8, marginTop: 8 }}>
+        <div
+          style={{
+            background: "#ECF5F0",
+            borderRadius: 10,
+            padding: "8px 10px",
+            fontSize: 12,
+          }}
+        >
+          <div style={{ fontSize: 11, color: "#6B7280" }}>Start</div>
+          <div style={{ fontWeight: 700 }}>{project.start}</div>
+        </div>
+        <div
+          style={{
+            background: "#ECF5F0",
+            borderRadius: 10,
+            padding: "8px 10px",
+            fontSize: 12,
+          }}
+        >
+          <div style={{ fontSize: 11, color: "#6B7280" }}>Gereed</div>
+          <div style={{ fontWeight: 700 }}>{project.end}</div>
+        </div>
+        <div
+          style={{
+            background: "#ECF5F0",
+            borderRadius: 10,
+            padding: "8px 10px",
+            fontSize: 12,
+          }}
+        >
+          <div style={{ fontSize: 11, color: "#6B7280" }}>Type</div>
+          <div style={{ fontWeight: 700 }}>{project.type}</div>
+        </div>
+      </div>
+
+      <div style={{ display: "flex", gap: 8, marginTop: 10 }}>
+        <button className="pv-btn" onClick={onZoom}>
+          Zoom naar project
+        </button>
+        <button className="pv-btn-outline" onClick={onClose}>
+          Sluiten
+        </button>
+      </div>
+    </div>
+  );
+}
 
 export default function App() {
   const [query, setQuery] = useState("");
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [focus3D, setFocus3D] = useState<{ lat: number; lon: number; zoom?: number } | null>(null);
-  const [showFeedback, setShowFeedback] = useState(false);
+  const [focus3D, setFocus3D] = useState<Focus>(null);
 
   const filtered = useMemo(() => {
     if (!query.trim()) return PROJECTS;
     const q = query.toLowerCase();
-    const maybeArea = POSTCODE_AREAS[query];
-    return PROJECTS.filter(p =>
-      [p.title, p.area, p.status, p.summary].some(v => v.toLowerCase().includes(q)) ||
-      (maybeArea && p.area.toLowerCase().includes(maybeArea.toLowerCase()))
-    );
+    const areaHint = POSTCODE_AREAS[query.trim()];
+    return PROJECTS.filter((p) => {
+      const textHit =
+        p.title.toLowerCase().includes(q) ||
+        p.area.toLowerCase().includes(q) ||
+        p.status.toLowerCase().includes(q) ||
+        p.summary.toLowerCase().includes(q) ||
+        p.type.toLowerCase().includes(q);
+      const areaHit = areaHint ? p.area.toLowerCase().includes(areaHint.toLowerCase()) : false;
+      return textHit || areaHit;
+    });
   }, [query]);
 
-  const selected = useMemo(() => PROJECTS.find(p => p.id === selectedId) || null, [selectedId]);
+  const selected = useMemo(
+    () => PROJECTS.find((p) => p.id === selectedId) || null,
+    [selectedId]
+  );
 
   function handleSearchGo() {
-    if (POSTCODE_AREAS[query]) {
-      const area = POSTCODE_AREAS[query];
-      const p = PROJECTS.find(x => x.area.toLowerCase().includes(area.toLowerCase()));
-      if (p) { setSelectedId(p.id); setFocus3D({ lat: p.lat, lon: p.lon, zoom: 15 }); return; }
+    try {
+      const pcHint = POSTCODE_AREAS[query.trim()];
+      if (pcHint) {
+        const p = PROJECTS.find((x) => x.area.toLowerCase().includes(pcHint.toLowerCase()));
+        if (p) {
+          setSelectedId(p.id);
+          setFocus3D({ lat: p.lat, lon: p.lon, zoom: 15 });
+          return;
+        }
+      }
+      if (filtered.length === 1) {
+        const p = filtered[0];
+        setSelectedId(p.id);
+        setFocus3D({ lat: p.lat, lon: p.lon, zoom: 16 });
+        return;
+      }
+      if (filtered.length > 1) {
+        const p = filtered[0];
+        setSelectedId(p.id);
+        setFocus3D({ lat: p.lat, lon: p.lon, zoom: 14 });
+        return;
+      }
+      alert("Geen resultaten gevonden.");
+    } catch (e) {
+      console.warn("Search error:", e);
     }
-    if (filtered.length === 1) {
-      const p = filtered[0]; setSelectedId(p.id); setFocus3D({ lat: p.lat, lon: p.lon, zoom: 16 }); return;
-    }
-    if (filtered.length > 1) {
-      const p = filtered[0]; setSelectedId(p.id); setFocus3D({ lat: p.lat, lon: p.lon, zoom: 14 }); return;
-    }
-    alert("Geen resultaten gevonden voor je zoekopdracht.");
-  }
-
-  function handleFeedbackSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    const fd = new FormData(e.currentTarget);
-    const naam = (fd.get("naam") as string) || "";
-    const email = (fd.get("email") as string) || "";
-    const onderwerp = (fd.get("onderwerp") as string) || "Feedback Citiverse";
-    const bericht = (fd.get("bericht") as string) || "";
-    const to = "citiverse@voorbeeld.nl"; // <-- vervang door jouw e-mailadres
-    const body = `Naam: ${naam}\nEmail: ${email}\nOnderwerp: ${onderwerp}\n\nBericht:\n${bericht}\n\n— Verzonden via PlanVertaler – Citiverse`;
-    window.location.href = `mailto:${encodeURIComponent(to)}?subject=${encodeURIComponent(onderwerp)}&body=${encodeURIComponent(body)}`;
-    setShowFeedback(false);
   }
 
   return (
     <div>
+      {/* Header */}
       <header className="pv-header">
         <div className="pv-header-inner">
-          {/* Logo uit /public */}
-          <img src="/planvertaler.png" alt="PlanVertaler Rotterdam" className="pv-logo" />
+          <img src={logo} alt="PlanVertaler Rotterdam" className="pv-logo" />
           <div className="pv-header-title">
             <div className="title">PlanVertaler – Citiverse</div>
             <div className="subtitle">Rotterdam</div>
           </div>
           <div className="pv-header-spacer" />
-          <button className="pv-header-btn" onClick={() => setShowFeedback(true)}>🔔 Meldingen</button>
+          <button className="pv-header-btn">🔔 Meldingen</button>
         </div>
       </header>
 
+      {/* Layout */}
       <main className="pv-main">
-        {/* LINKS */}
+        {/* Linkerkolom */}
         <section className="pv-card">
           <div className="pv-card-header">Zoek</div>
           <div className="pv-card-body">
@@ -76,106 +169,62 @@ export default function App() {
                 placeholder="Project, gebied of postcode (bv. 3199)"
                 className="pv-input"
               />
-              <button className="pv-btn" onClick={handleSearchGo}>Zoek</button>
+              <button className="pv-btn" onClick={handleSearchGo}>
+                Zoek
+              </button>
             </div>
-            <div style={{ fontSize: 12, color: "#6b7280" }}>
-              Tip: 3199 = Maasvlakte, 3087 = Waalhaven
-            </div>
+            <div style={{ fontSize: 12, color: "#6b7280" }}>Tip: 3199 = Maasvlakte, 3087 = Waalhaven</div>
 
-            <div className="pv-card-header" style={{ marginTop: 12 }}>Meedenken</div>
+            <div className="pv-card-header" style={{ marginTop: 12 }}>
+              Meedenken
+            </div>
             <p style={{ fontSize: 14, color: "#374151" }}>
               Denk mee over plannen in jouw buurt. Deel ideeën of zorgen – we koppelen terug wat ermee gebeurt.
             </p>
-            <button className="pv-btn-outline" onClick={() => setShowFeedback(true)}>Geef feedback</button>
+            <button className="pv-btn-outline">Geef feedback</button>
           </div>
         </section>
 
-        {/* MIDDEN: alleen 3D Rotterdam (OUP) */}
-        <section className="pv-card">
+        {/* Middenkolom: 3D-kaart */}
+        <section className="pv-card" style={{ position: "relative" }}>
           <div className="pv-card-header">3D Rotterdam</div>
           <div className="pv-card-body">
-            <div className="pv-map">
+            <div className="pv-map" style={{ height: 560, position: "relative" }}>
               <City3D
                 projects={filtered}
                 focus={focus3D}
-                onSelect={(id) => setSelectedId(id)}
+                onSelect={(id) => {
+                  // defensief: alleen als id bestaat
+                  if (!id) {
+                    setSelectedId(null);
+                    return;
+                  }
+                  const p = PROJECTS.find((x) => x.id === id);
+                  if (p) {
+                    setSelectedId(id);
+                  } else {
+                    console.warn("Gekozen id niet gevonden:", id);
+                    setSelectedId(null);
+                  }
+                }}
               />
+
+              {selected && (
+                <ProjectCard
+                  project={selected}
+                  onZoom={() => setFocus3D({ lat: selected.lat, lon: selected.lon, zoom: 16 })}
+                  onClose={() => setSelectedId(null)}
+                />
+              )}
             </div>
           </div>
         </section>
 
-        {/* RECHTS */}
-        <section className="pv-card">
-          <div className="pv-card-header">Details</div>
-          <div className="pv-card-body" style={{ display: "grid", gap: 8 }}>
-            {!selected ? (
-              filtered.map(p => (
-                <button
-                  key={p.id}
-                  className="pv-btn-outline"
-                  style={{ textAlign: "left" }}
-                  onClick={() => setSelectedId(p.id)}
-                >
-                  {p.title}
-                </button>
-              ))
-            ) : (
-              <div style={{ display: "grid", gap: 10 }}>
-                <h3 style={{ margin: 0, color: "#16324f" }}>{selected.title}</h3>
-                <div style={{ fontSize: 12, color: "#6b7280" }}>
-                  Gebied: {selected.area} • Fase: {selected.status}
-                </div>
-                <div>{selected.summary}</div>
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 8 }}>
-                  <div style={{ background: "#e6f1ec", padding: 8, borderRadius: 12 }}>
-                    <div style={{ fontSize: 10, color: "#6b7280" }}>Start</div>
-                    <div style={{ fontWeight: 600 }}>{selected.start}</div>
-                  </div>
-                  <div style={{ background: "#e6f1ec", padding: 8, borderRadius: 12 }}>
-                    <div style={{ fontSize: 10, color: "#6b7280" }}>Gereed</div>
-                    <div style={{ fontWeight: 600 }}>{selected.ready}</div>
-                  </div>
-                  <div style={{ background: "#e6f1ec", padding: 8, borderRadius: 12 }}>
-                    <div style={{ fontSize: 10, color: "#6b7280" }}>Type</div>
-                    <div style={{ fontWeight: 600, fontSize: 12 }}>{selected.type.join(", ")}</div>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
+        {/* Rechterkolom: Wegwijzer (GPT) */}
+        <section className="pv-card" style={{ padding: 0 }}>
+          <AssistantPanel />
         </section>
       </main>
-
-      {/* Feedback modal */}
-      {showFeedback && (
-        <div
-          role="dialog"
-          aria-modal="true"
-          style={{
-            position: "fixed", inset: 0, background: "rgba(0,0,0,.45)",
-            display: "grid", placeItems: "center", zIndex: 50
-          }}
-          onClick={() => setShowFeedback(false)}
-        >
-          <div
-            className="pv-card"
-            style={{ width: "min(680px, 96vw)" }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="pv-card-header">Geef feedback</div>
-            <form className="pv-card-body" onSubmit={handleFeedbackSubmit}>
-              <input name="naam" className="pv-input" placeholder="Je naam (optioneel)" />
-              <input name="email" type="email" className="pv-input" placeholder="Je e-mail (optioneel)" />
-              <input name="onderwerp" className="pv-input" placeholder="Onderwerp" defaultValue="Feedback Citiverse" />
-              <textarea name="bericht" className="pv-input" placeholder="Je bericht" rows={6} required />
-              <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
-                <button type="button" className="pv-btn-outline" onClick={() => setShowFeedback(false)}>Annuleer</button>
-                <button type="submit" className="pv-btn">Verstuur</button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

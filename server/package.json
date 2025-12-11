@@ -1,0 +1,7 @@
+{
+  "scripts": {
+    "dev": "vite",
+    "server": "ts-node server/index.ts",
+    "ingest": "ts-node server/index.ts --ingest"
+  }
+}
