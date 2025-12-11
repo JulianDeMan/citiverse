@@ -1,54 +1,56 @@
-// api/ask.ts — POST /api/ask (zelfde als /api/chat)
-const OPENAI_URL = 'https://api.openai.com/v1/chat/completions';
-const MODEL = 'gpt-4o-mini';
+export const config = { runtime: "edge" };
 
-export default async function handler(req: any, res: any) {
-  if (req.method !== 'POST') {
-    res.status(405).json({ error: 'Method Not Allowed', allow: 'POST' });
-    return;
-  }
+function json(resBody: unknown, status = 200) {
+  return new Response(JSON.stringify(resBody), {
+    status,
+    headers: { "content-type": "application/json" },
+  });
+}
 
+export default async function handler(req: Request): Promise<Response> {
   try {
-    const apiKey = process.env.OPENAI_API_KEY;
-    if (!apiKey) {
-      res.status(500).json({ error: 'Missing OPENAI_API_KEY env var' });
-      return;
+    if (req.method !== "POST") return json({ error: "Method Not Allowed" }, 405);
+
+    const body = await req.json().catch(() => ({}));
+    const question: string = typeof body?.question === "string" ? body.question : "";
+
+    const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+    if (!OPENAI_API_KEY) {
+      console.error("OPENAI_API_KEY ontbreekt");
+      return json({ error: "Server is niet geconfigureerd (OPENAI_API_KEY)" }, 500);
+    }
+    if (!question) {
+      return json({ error: "question ontbreekt" }, 400);
     }
 
-    const { messages = [], systemPrompt } = req.body || {};
-    if (!Array.isArray(messages) || messages.length === 0) {
-      res.status(400).json({ error: 'Body must contain { messages: [...] }' });
-      return;
-    }
-
-    const fullMessages = [
-      ...(systemPrompt ? [{ role: 'system', content: systemPrompt }] : []),
-      ...messages,
-    ];
-
-    const r = await fetch(OPENAI_URL, {
-      method: 'POST',
+    // Simpele call naar OpenAI; pas model evt. aan
+    const r = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${apiKey}`,
+        "content-type": "application/json",
+        authorization: `Bearer ${OPENAI_API_KEY}`,
       },
       body: JSON.stringify({
-        model: MODEL,
+        model: "gpt-4o-mini",
         temperature: 0.2,
-        messages: fullMessages,
+        messages: [
+          { role: "system", content: "Je bent een behulpzame assistent." },
+          { role: "user", content: question },
+        ],
       }),
     });
 
     if (!r.ok) {
-      const text = await r.text().catch(() => '');
-      res.status(r.status).json({ error: `Upstream error ${r.status}`, detail: text });
-      return;
+      const txt = await r.text();
+      console.error("OpenAI error:", r.status, txt);
+      return json({ error: `Upstream ${r.status}`, details: txt }, 502);
     }
 
     const data = await r.json();
-    const answer = data?.choices?.[0]?.message?.content ?? '';
-    res.status(200).json({ answer });
+    const answer = data?.choices?.[0]?.message?.content ?? "";
+    return json({ answer });
   } catch (err: any) {
-    res.status(500).json({ error: 'Server error', detail: String(err?.message || err) });
+    console.error("ask error:", err?.stack || err);
+    return json({ error: "Internal Server Error" }, 500);
   }
 }
