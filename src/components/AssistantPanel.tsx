@@ -75,7 +75,7 @@ const res = await fetch("/api/ask", {
     <div
       className="pv-card"
       style={{
-        height: 560,               // zelfde hoogte als de 3D-kaart
+        height: 640,               // zelfde hoogte als de 3D-kaart
         display: "grid",
         gridTemplateRows: "auto 1fr auto",
         overflow: "hidden",
